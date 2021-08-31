@@ -42,18 +42,38 @@ export function empty(value: any) {
 	return false;
 }
 
-export function isPrefix(route: Route): boolean {
+/**
+ * Check if Route is a Prefix Object
+ * @param route
+ */
+
+export function isPrefix(route: Route) {
 	return route.prefix && !route.name && !route.path && !route.component;
 }
+
+/**
+ * Check if Path contains a dynamic Segment
+ * @param path
+ */
 
 export function isDynamicSegment(path: string): boolean {
 	return path.includes('/:') || path.includes(':');
 }
 
+/**
+ * Get Name from dynamic Segment
+ * @param segment
+ */
+
 export function getNameFromSegment(segment: string): string {
 	const element = split(normalizeRoutePath(segment), '/').find((seg) => isDynamicSegment(seg));
 	return split(element.replace(/(:|\/:)/g, ''), '_')[0];
 }
+
+/**
+ * Normalize Route Path by removing forwarding Slash if existent
+ * @param path
+ */
 
 export function normalizeRoutePath(path: string): string {
 	return path.charAt(0) === '/' ? path.slice(1) : path;
