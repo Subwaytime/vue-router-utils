@@ -10,6 +10,13 @@ export interface Options {
 	 */
 
 	seperator: string;
+
+	/**
+	 * Disable Vue Router Slash Rooting
+	 * @default true
+	 */
+
+	disableRooting: boolean;
 }
 
 export type Component = ReturnType<typeof defineComponent>;
@@ -19,7 +26,7 @@ export type Route = {
 	prefix?: string;
 	name?: string;
 	children?: Route[];
-	component?: Component
+	component?: void
 	meta?: any;
 	props?: any;
 };
