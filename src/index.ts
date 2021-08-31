@@ -10,7 +10,7 @@ export class RouterUtilities {
 	constructor(routes: Route[], options?: Partial<Options>) {
 		this.routes = routes;
 		this.options = Object.assign({}, config, options);
-		this.format();
+		return this.format() as any;
 	}
 
 	/**
@@ -115,8 +115,10 @@ export class RouterUtilities {
 					route.meta = parentRoute.meta;
 				}
 
-				// remove slash from route (disables vue-router rooting)
-				route.path = normalizeRoutePath(route.path);
+				if(this.options.disableRooting) {
+					// remove slash from route (disables vue-router rooting)
+					route.path = normalizeRoutePath(route.path);
+				}
 			} else {
 				// check whether route has no name and their path does not include a dynamic segment
 				if (!route.name && !isDynamicSegment(route.path)) {
@@ -134,7 +136,7 @@ export class RouterUtilities {
 		if(!parentRoute.prefix) {
 			throw new Error('Prefix needs to be defined.');
 		}
-		const prefix: string = parentRoute.prefix;
+		const prefix: string = normalizeRoutePath(parentRoute.prefix);
 
 		return routes.map((route) => {
 			if (route.name && empty(route.children)) {
