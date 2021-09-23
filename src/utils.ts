@@ -1,4 +1,5 @@
 import { Route } from './types';
+import consola from 'consola';
 
 /**
  * Split String on Seperator into Array
@@ -78,3 +79,9 @@ export function getNameFromSegment(segment: string): string {
 export function normalizeRoutePath(path: string): string {
 	return path.charAt(0) === '/' ? path.slice(1) : path;
 }
+
+/**
+ * Simple Info/Warn/Error Consola Instance
+ */
+
+export const logger = consola.create({});

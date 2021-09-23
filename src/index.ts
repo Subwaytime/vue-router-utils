@@ -1,5 +1,5 @@
 import { Options, Route } from './types';
-import { empty, getNameFromSegment, isDynamicSegment, isPrefix, normalizeRoutePath, split, toArray } from './utils';
+import { empty, getNameFromSegment, isDynamicSegment, isPrefix, logger, normalizeRoutePath, split, toArray } from './utils';
 
 import { config } from './constant';
 
@@ -49,7 +49,7 @@ export class RouterUtilities {
 			// and parse children routes
 			if (isPrefix(route)) {
 				if(!route.children) {
-					throw new Error('Prefix Objects need Routes as `Children Array` to be applied too.');
+					throw logger.error(new Error('Prefix Objects need Routes as `Children Array` to be applied too.'));
 				}
 				const prefixed = this.prefix(route.children, route).flatMap((p) => this.parse(p));
 				fixedRoutes = [...fixedRoutes, ...prefixed];
@@ -86,7 +86,7 @@ export class RouterUtilities {
 					} else {
 						// route has no name
 						if (!route.path) {
-							throw new Error('Route needs atleast a `name` or a `path`');
+							throw logger.error(new Error('Route needs atleast a `name` or a `path`'));
 						}
 
 						// check if parent route has a name
@@ -122,7 +122,7 @@ export class RouterUtilities {
 			} else {
 				// check whether route has no name and their path does not include a dynamic segment
 				if (!route.name && !isDynamicSegment(route.path)) {
-					throw new Error('Routes need to have a name assigned to them.');
+					throw logger.error(new Error('Routes need to have a name assigned to them.'));
 				}
 			}
 
@@ -134,7 +134,7 @@ export class RouterUtilities {
 
 	prefix(routes: Route[], parentRoute: Route) {
 		if(!parentRoute.prefix) {
-			throw new Error('Prefix needs to be defined.');
+			throw logger.error(new Error('Prefix needs to be defined.'));
 		}
 		const prefix: string = normalizeRoutePath(parentRoute.prefix);
 
