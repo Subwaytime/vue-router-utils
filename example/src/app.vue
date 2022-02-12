@@ -17,21 +17,8 @@
 </template>
 
 
-<script>
+<script setup>
 import navigation from './components/navigation.vue';
 import tree from './components/tree.vue';
 import { routes } from './router';
-
-export default {
-	name: 'app',
-	components: {
-		navigation,
-		tree
-	},
-	setup() {
-		return {
-			routes
-		};
-	}
-};
 </script>

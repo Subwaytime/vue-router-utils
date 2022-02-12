@@ -1,7 +1,7 @@
 <template>
 	<nav>
 		<ul>
-			<li>
+			<!-- <li>
 				<router-link :to="{ name: 'auth:login' }">
 					Login
 				</router-link>
@@ -25,7 +25,7 @@
 				<router-link :to="{ name: 'user:stats' , params: { user: 'subwaytime' }}">
 					User Stats
 				</router-link>
-			</li>
+			</li> -->
 		</ul>
 	</nav>
 </template>

@@ -1,10 +1,16 @@
 <template>
 	<code>
-		Name: {{ $route.name }}
+		<span>
+			Name: {{ $route.name }}
+		</span>
 		<br />
-		Path: {{ $route.path }}
+		<span>
+			Path: {{ $route.path }}
+		</span>
 		<br />
-		Params: {{ $route.params }}
+		<span>
+			Params: {{ $route.params }}
+		</span>
 	</code>
 </template>
 
