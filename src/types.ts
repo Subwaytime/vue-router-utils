@@ -17,6 +17,13 @@ export interface Options {
 	 */
 
 	disableRooting: boolean;
+
+	/**
+	 * Defines max routes depth
+	 * @default 3 levels
+	 */
+
+	maxDepth: number;
 }
 
 export type Component = ReturnType<typeof defineComponent>;
