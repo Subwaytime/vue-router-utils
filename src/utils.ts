@@ -31,12 +31,12 @@ export function toArray<T>(value: T | T[]): T[] {
  * @param value
  */
 
-export function empty(value: any) {
-	if (value === null || value === undefined || value === '{}' || value === '') {
+export function isEmpty(value: any) : boolean {
+	if (value === null || value === undefined || value === '{}' || value === '' || JSON.stringify(value) === '{}') {
 		return true;
 	}
 
-	if (Array.isArray(value) && Object.keys(value).length <= 0) {
+	if (Array.isArray(value) && (Object.keys(value).length <= 0 || value.length === 0)) {
 		return true;
 	}
 
@@ -85,3 +85,6 @@ export function normalizeRoutePath(path: string): string {
  */
 
 export const logger = consola.create({});
+export function abort(message: any) {
+	throw logger.error(new Error(message));
+}

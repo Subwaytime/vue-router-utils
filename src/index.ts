@@ -1,5 +1,5 @@
 import { Options, Route } from './types';
-import { empty, getNameFromSegment, isDynamicSegment, isPrefix, logger, normalizeRoutePath, split, toArray } from './utils';
+import { isEmpty, getNameFromSegment, isDynamicSegment, isPrefix, logger, normalizeRoutePath, split, toArray, abort } from './utils';
 
 import { config } from './constant';
 
@@ -18,7 +18,7 @@ export class RouterUtilities {
 	 * @returns
 	 */
 
-	format() {
+	format(): Route[] {
 		const parsedRoutes = this.parse(this.routes);
 
 		return parsedRoutes.sort((a: Route, b: Route): any => {
@@ -27,7 +27,7 @@ export class RouterUtilities {
 				return 1;
 			}
 
-			if(a.path && b.path) {
+			if (a.path && b.path) {
 				// sort routes alphabetically per route path
 				a.path.localeCompare(b.path);
 			}
@@ -41,89 +41,79 @@ export class RouterUtilities {
 	 * @returns
 	 */
 
-	parse(routes: Route | Route[], parentRoute?: Route) {
+	parse(routes: Route | Route[], depth: number = 0, parent?: Route): Route[] {
 		let fixedRoutes: Route[] = [];
 
+		if (depth <= this.options.maxDepth) {
+			abort(`Your Routes go beyond the max depth of ${this.options.maxDepth}! Try using a prefix or simplyfy your Routes.`);
+		}
+
 		toArray(routes).filter((route: Route) => {
-			// check if route is a prefix, if yes use prefix function
-			// and parse children routes
 			if (isPrefix(route)) {
-				if(!route.children) {
-					throw logger.error(new Error('Prefix Objects need Routes as `Children Array` to be applied too.'));
+				// handle prefix routes
+				if (isEmpty(route.children)) {
+					abort('Prefix Objects needs to have a children Property containing Routes.');
 				}
-				const prefixed = this.prefix(route.children, route).flatMap((p) => this.parse(p));
+
+				const prefixed = this.prefix(route.children as Route[], route).flatMap((r) =>
+					this.parse(r),
+				);
 				fixedRoutes = [...fixedRoutes, ...prefixed];
 				return;
 			}
 
-			// check if route has children, if yes repeat parsing
-			if (route.children) {
-				route.children = this.parse(route.children, route);
-			}
-
-			// check if route is a child
-			if (parentRoute) {
-				// check if route does not have a dynamic segment, or it has one but no children routes
-				if ((isDynamicSegment(route.path) && !route.children) || !isDynamicSegment(route.path)) {
-					// check if parent route has a dynamic segment
-					if (isDynamicSegment(parentRoute.path)) {
-						route.name = `${getNameFromSegment(parentRoute.path)}${this.options.seperator}${route.name}`;
-					}
-					// check if route has a name
-					else if (route.name) {
-						const parentPath = normalizeRoutePath(parentRoute.path);
-
-						// check if route name and parent name are equal
-						if (parentRoute.name && parentRoute.name.localeCompare(route.name) != 0) {
-							route.name = `${parentRoute.name}${this.options.seperator}${route.name}`;
-						}
-						// check if route is not included in parent path
-						else if (!split(parentPath, '/').includes(route.name)) {
-							route.name = `${parentPath.replace(/\//g, `${this.options.seperator}`)}${this.options.seperator}${
+			// check if route has a parent
+			if (parent) {
+				if (isDynamicSegment(parent.path)) {
+					if (route.name) {
+						if (parent.name && parent.name.localeCompare(route.name) != 0) {
+							route.name = `${parent.name}${this.options.seperator}${route.name}`;
+						} else {
+							route.name = `${getNameFromSegment(parent.path)}${this.options.seperator}${
 								route.name
 							}`;
 						}
 					} else {
-						// route has no name
-						if (!route.path) {
-							throw logger.error(new Error('Route needs atleast a `name` or a `path`'));
+						abort(`Route: ${route.path} needs to have a Name assigned to them.`);
+					}
+				} else if (isDynamicSegment(route.path) && !isDynamicSegment(parent.path)) {
+					if (route.name) {
+						if (parent.name && parent.name.localeCompare(route.name) != 0) {
+							route.name = `${parent.name}${this.options.seperator}${route.name}`;
 						}
-
-						// check if parent route has a name
-						if (parentRoute.name) {
-							const path = normalizeRoutePath(route.path);
-							route.name = `${parentRoute.name}${this.options.seperator}${path.replace(
-								/\//g,
-								`${this.options.seperator}`,
-							)}`;
-						} else {
-							// if not then just use route path and parent path
-							const parentPath = normalizeRoutePath(parentRoute.path);
-							const routePath = normalizeRoutePath(route.path);
-							route.name = `${parentPath.replace(/\//g, `${this.options.seperator}`)}${
-								this.options.seperator
-							}${routePath.replace(/\//g, `${this.options.seperator}`)}`;
-						}
+					} else {
+						abort(
+							`Dynamic Children Route: ${route.path} needs to have a Name assigned to them.`,
+						);
 					}
 				} else {
-					if(!route.children) { return; };
-					route.children = this.parse(route.children, parentRoute);
+					if (route.name) {
+						if (parent.name && parent.name.localeCompare(route.name) != 0) {
+							route.name = `${parent.name}${this.options.seperator}${route.name}`;
+						}
+					} else {
+						abort(`Route: ${route.path} needs to have a Name assigned to them.`);
+					}
 				}
 
-				// inherit parent meta if existent
-				if (parentRoute.meta) {
-					route.meta = parentRoute.meta;
+				// inherit parent meta
+				if (!isEmpty(parent.meta)) {
+					route.meta = parent.meta;
 				}
 
-				if(this.options.disableRooting) {
-					// remove slash from route (disables vue-router rooting)
+				// remove slash from route (disables vue-router rooting)
+				if (this.options.disableRooting) {
 					route.path = normalizeRoutePath(route.path);
 				}
 			} else {
-				// check whether route has no name and their path does not include a dynamic segment
 				if (!route.name && !isDynamicSegment(route.path)) {
-					throw logger.error(new Error('Routes need to have a name assigned to them.'));
+					abort(`Route: ${route.path} needs to have a Name assigned to them.`);
 				}
+			}
+
+			// repeat if route has children
+			if (!isEmpty(route.children)) {
+				route.children = this.parse(route.children as Route[], depth + 1, route);
 			}
 
 			fixedRoutes.push(route);
@@ -132,25 +122,35 @@ export class RouterUtilities {
 		return fixedRoutes;
 	}
 
-	prefix(routes: Route[], parentRoute: Route) {
-		if(!parentRoute.prefix) {
-			throw logger.error(new Error('Prefix needs to be defined.'));
+	/**
+	 *
+	 * @param routes
+	 * @param parent
+	 * @returns
+	 */
+
+	prefix(routes: Route[], parent: Route): Route[] {
+		if (isEmpty(parent.prefix)) {
+			abort('Prefix needs to be defined.');
 		}
-		const prefix: string = normalizeRoutePath(parentRoute.prefix);
+
+		const prefix: string = normalizeRoutePath(parent.prefix as string);
 
 		return routes.map((route) => {
-			if (route.name && empty(route.children)) {
+			if (route.name) {
 				if (isDynamicSegment(prefix)) {
 					route.name = `${getNameFromSegment(prefix)}${this.options.seperator}${route.name}`;
 				} else {
 					route.name = `${prefix}${this.options.seperator}${route.name}`;
 				}
+			} else {
+				abort(`Route: ${route.path} needs to have a Name assigned to them.`);
 			}
 
 			route.path = `/${prefix}${route.path}`;
 
-			if (parentRoute.meta) {
-				route.meta = parentRoute.meta;
+			if (parent.meta) {
+				route.meta = parent.meta;
 			}
 
 			return route;
