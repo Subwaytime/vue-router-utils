@@ -44,7 +44,7 @@ export class RouterUtilities {
 	parse(routes: Route | Route[], depth: number = 0, parent?: Route): Route[] {
 		let fixedRoutes: Route[] = [];
 
-		if (depth <= this.options.maxDepth) {
+		if (depth === this.options.maxDepth) {
 			abort(`Your Routes go beyond the max depth of ${this.options.maxDepth}! Try using a prefix or simplyfy your Routes.`);
 		}
 
