@@ -1,42 +1,49 @@
 {
-    "name": "vue-router-utils",
-    "description": "Vue Router 4 Utilities",
-    "version": "0.0.2",
-    "main": "dist/index.js",
-    "module": "dist/index.mjs",
-    "types": "dist/index.d.ts",
-    "private": false,
-    "license": "MIT",
-    "author": "Subwaytime <leon.l@nophase.de>",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/subwaytime/vue-router-utils"
-    },
-    "homepage": "https://github.com/subwaytime/vue-router-utils#readme",
-    "bugs": "https://github.com/subwaytime/vue-router-utils/issues",
-    "files": [
-        "dist"
-    ],
-    "keywords": [
-        "vue",
-        "vue-router",
-        "vue3",
-        "prefix",
-        "utilities"
-    ],
-    "scripts": {
-        "update:packages": "npm update --save-dev && npm update --save",
-        "dev": "npm run build -- --watch",
-        "build": "tsup src/index.ts --dts --format cjs,esm",
-        "release": "npx git-ensure -a && npx bumpp --commit --tag --push && npm publish",
-        "prepublishOnly": "npm run build"
-    },
-    "devDependencies": {
-        "tsup": "^5.1.0",
-        "typescript": "^4.4.3",
-        "vue": "^3.2.6"
-    },
-    "dependencies": {
-        "consola": "^2.15.3"
-    }
+	"name": "vue-router-utils",
+	"description": "Vue Router 4 Utilities",
+	"version": "0.0.3",
+	"main": "dist/index.js",
+	"module": "dist/index.mjs",
+	"types": "dist/index.d.ts",
+	"exports": {
+		".": {
+			"require": "./dist/index.js",
+			"import": "./dist/index.mjs",
+			"types": "./dist/index.d.ts"
+		}
+	},
+	"private": false,
+	"license": "MIT",
+	"author": "Subwaytime <leon.l@nophase.de>",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/subwaytime/vue-router-utils"
+	},
+	"homepage": "https://github.com/subwaytime/vue-router-utils#readme",
+	"bugs": "https://github.com/subwaytime/vue-router-utils/issues",
+	"files": [
+		"dist"
+	],
+	"keywords": [
+		"vue",
+		"vue-router",
+		"vue3",
+		"prefix",
+		"utilities"
+	],
+	"scripts": {
+		"update:packages": "npm update --save-dev && npm update --save",
+		"dev": "npm run build -- --watch",
+		"build": "tsup src/index.ts --dts --format cjs,esm",
+		"release": "npx git-ensure -a && npx bumpp --commit --tag --push && npm publish",
+		"prepublishOnly": "npm run build"
+	},
+	"devDependencies": {
+		"tsup": "^5.11.13",
+		"typescript": "^4.5.5",
+		"vue": "^3.2.30"
+	},
+	"dependencies": {
+		"consola": "^2.15.3"
+	}
 }
