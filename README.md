@@ -1,8 +1,10 @@
-This Package is out of Date and not maintained anymore!
-<br />
+
+# This Package is out of Date and not maintained anymore !
+
 All of the Features are now available in  [unplugin-vue-router](https://github.com/posva/unplugin-vue-router)
 
-<h2 align="left">vue-router-utils</h2>
+
+<h3 align="left">vue-router-utils</h2>
 
 <p align="left">Vue Router 4 Utilities</p>
 
